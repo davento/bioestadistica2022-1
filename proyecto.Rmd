@@ -1,0 +1,72 @@
+---
+title: "proyecto"
+output: html_document
+date: '2022-06-28'
+---
+
+
+```{r warning=FALSE}
+library(haven)
+library(foreign)
+library(readr) #Leer archivos
+library(tidyverse) #Manipular la data
+library(lubridate) #Manipular las fechas
+library(aweek) #Manipular las fechas
+```
+
+
+
+```{r}
+# read csv file
+df <- read.csv("violence_clean.csv")
+#filter
+db <- df %>% filter(crime_region == "Lima")
+
+```
+
+```{r}
+#Dimension del data frame (filas y columnas)
+dim(db) 
+
+
+# Nos muestra las primeras 15 observaciones
+head(db, n = 15) 
+```
+
+```{r}
+summary(df[1:10]) 
+```
+
+
+```{r}
+class(df$victim_lgbti)
+unique(df$victim_lgbti)
+```
+
+```{r}
+total = length(db$victim_lgbti)
+cases = sum(db$victim_lgbti == "Negative")
+
+100 - cases / total * 100
+```
+
+
+
+```{r}
+table(db$victim_education)
+table(db$econ_income_control)
+table(db$econ_money_restriction)
+```
+
+
+```{r}
+unfilter_df <- read.csv("violence_2021.csv")
+```
+
+
+
+
+
+
+
+
