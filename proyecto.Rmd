@@ -4,10 +4,10 @@ output: html_document
 date: '2022-06-28'
 ---
 
-
 ```{r warning=FALSE}
 library(haven)
 library(foreign)
+library(nortest)#Kolmogorov
 library(readr) #Leer archivos
 #library(tidyverse) #Manipular la data
 library(lubridate) #Manipular las fechas
@@ -15,7 +15,6 @@ library(aweek) #Manipular las fechas
 library(dplyr)
 library(modeest)
 ```
-
 
 # Lecture and Filtering of the data base
 
@@ -25,7 +24,6 @@ df <- read.csv("violence_clean.csv")
 
 # Storing only relevant variables
 df <- df %>% dplyr::select(`reporting_center`, `newcase`,`year`, `crime_years`, `crime_region`, `crime_urban`, `crime_femicide_attemp`, `crime_violence_type`, `verbal_assault`, `victim_age`, `victim_children`, `victim_children_groups`, `victim_language`, `victim_civil_status`, `victim_education`, `victim_job_status`, `victim_discapacity`, `victim_filesacomplaint`, `sex_harassment`, `sex_rape`, `verbal_assault`, `thread_children`, `physical_kicks`, `physical_punches`, `physical_hairpull`, `victim_children_groups`, `treatment_psycological`, `treatment_psyquiatric`, `treatment_medic`, `bond_family_d`, `bond_family_d`, `bond_coworkers`, `bond_neighbor`, `bond_friends`, `bond_partner`, `agressor_age`, `agressor_age_group`, `agressor_gender`, `agressor_education`, `agressor_education`, `agressor_job_status`, `agressor_foreign`)
-
 ```
 
 ```{r}
@@ -151,6 +149,33 @@ ggplot(data = df, aes(x = dep, y = victim_children)) +
        ylab("Numero de Hijos") 
 ```
 
+Pruebas de normalidad
 
+```{r, warning=FALSE}
+analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5, verbose = TRUE){
+  D <- lillie.test(x)
+  print(D)
+  p_value <- D[2]
+  is_normal <- (p_value > threshold_p)
+  cv <- sd(x, na.rm = TRUE)/mean(x, na.rm = TRUE)
+  is_parametric <- (cv < threshold_cv)
+  if(verbose){
+    if(is_normal){
+      cat("* Has normal distribution.\n")
+    } else {
+      cat("* Has not a normal disribution.\n")
+    }
+    if(is_parametric){
+      cat("* Has parametric distribution.\n")
+    } else{
+      "* Has not a parametric distribution.\n"
+    }
+  }
+  return(list("has_normal_dist": is_normal, "has_parametric_dist": is_parametric, "p_value": p_value, "cv": cv))
+}
+
+victim_age_dist <- analyze_dist(df$victim_age)
+print(victim_age_dist)
+```
 
 
