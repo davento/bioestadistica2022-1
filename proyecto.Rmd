@@ -152,26 +152,18 @@ ggplot(data = df, aes(x = dep, y = victim_children)) +
 Pruebas de normalidad
 
 ```{r, warning=FALSE}
-analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5, verbose = TRUE){
-  D <- lillie.test(x)
-  print(D)
-  p_value <- D[2]
-  is_normal <- (p_value > threshold_p)
-  cv <- sd(x, na.rm = TRUE)/mean(x, na.rm = TRUE)
-  is_parametric <- (cv < threshold_cv)
-  if(verbose){
-    if(is_normal){
-      cat("* Has normal distribution.\n")
-    } else {
-      cat("* Has not a normal disribution.\n")
-    }
-    if(is_parametric){
-      cat("* Has parametric distribution.\n")
-    } else{
-      "* Has not a parametric distribution.\n"
-    }
+analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5){
+  p_value <- as.numeric(lillie.test(x)[2])
+  is_normal <- FALSE
+  if(p_value > threshold_p){
+    is_normal <- TRUE
   }
-  return(list("has_normal_dist": is_normal, "has_parametric_dist": is_parametric, "p_value": p_value, "cv": cv))
+  cv <- sd(x, na.rm = TRUE)/mean(x, na.rm = TRUE)
+  is_parametric <- FALSE
+  if(cv < threshold_cv){
+    is_parametric <- TRUE
+  }
+  return(list("has_normal_dist"=is_normal,"has_parametric_dist"=is_parametric,"p_value"= p_value,"cv"=cv))
 }
 
 victim_age_dist <- analyze_dist(df$victim_age)
