@@ -16,6 +16,9 @@ library(dplyr)
 library(modeest)
 ```
 
+
+# Lecture and Filtering of the data base
+
 ```{r}
 # Read csv file
 df <- read.csv("violence_clean.csv")
@@ -51,10 +54,17 @@ regions <- c(df_coastal, df_highland, df_jungle)
 ```
 
 
-
 ```{r}
-barplot(table(df$dep))
+#Dimension del data frame (filas y columnas)
+dim(df) 
+
+# Nos muestra las primeras 15 observaciones
+head(df, n = 15) 
 ```
+
+# descriptive analysis
+
+
 
 
 
@@ -84,12 +94,14 @@ analyze_single_var(df$victim_children)
 
 
 ```{r}
-class(df)
+table(df$dep) / nrow(df) * 100
 ```
 
 
+
+
 ```{r}
-ggplot(data = df, aes(x = "", y = victim_age)) +
+ggplot(data = df, aes(x = dep, y = victim_age)) +
        stat_boxplot(geom = "errorbar",      # Error bars
                     width = 0.2) +
        geom_boxplot(fill = "#4271AE",       # Box color
@@ -97,66 +109,47 @@ ggplot(data = df, aes(x = "", y = victim_age)) +
                     alpha = 0.9) +          # Box color transparency
        # ggtitle("Boxplot with vector") + # Plot title
        xlab("") +   # X-axis label
-       ylab("Edad de la victima") +
-       coord_flip() # Horizontal boxplot
-
-```
-
-
-```{r}
-# Use different dfs
-analyze_single_var(df_coastal$victim_age)
-analyze_single_var(df_coastal$crime_years)
-analyze_single_var(df_coastal$victim_children)
-analyze_single_var(df_highland$victim_age)
-analyze_single_var(df_highland$crime_years)
-analyze_single_var(df_highland$victim_children)
-analyze_single_var(df_jungle$victim_age)
-analyze_single_var(df_jungle$crime_years)
-analyze_single_var(df_jungle$victim_children)
-```
-
-```{r}
-#Dimension del data frame (filas y columnas)
-dim(db) 
-
-# Nos muestra las primeras 15 observaciones
-head(db, n = 15) 
-```
-
-```{r}
-summary(df[1:10]) 
-```
-
-
-```{r}
-class(df$victim_lgbti)
-unique(df$victim_lgbti)
-```
-
-```{r}
-total = length(db$victim_lgbti)
-cases = sum(db$victim_lgbti == "Negative")
-
-100 - cases / total * 100
+       ylab("Edad de la victima") 
 ```
 
 
 
 ```{r}
-table(db$victim_education)
-table(db$econ_income_control)
-table(db$econ_money_restriction)
+ggplot(data = df, aes(x = dep, y = agressor_age)) +
+       stat_boxplot(geom = "errorbar",      # Error bars
+                    width = 0.2) +
+       geom_boxplot(fill = "#4271AE",       # Box color
+                    outlier.colour = "red", # Outliers color
+                    alpha = 0.9) +          # Box color transparency
+       # ggtitle("Boxplot with vector") + # Plot title
+       xlab("") +   # X-axis label
+       ylab("Agresor age") 
+```
+
+```{r}
+ggplot(data = df, aes(x = dep, y = crime_years)) +
+       stat_boxplot(geom = "errorbar",      # Error bars
+                    width = 0.2) +
+       geom_boxplot(fill = "#4271AE",       # Box color
+                    outlier.colour = "red", # Outliers color
+                    alpha = 0.9) +          # Box color transparency
+       # ggtitle("Boxplot with vector") + # Plot title
+       xlab("") +   # X-axis label
+       ylab("Crime yeras") 
 ```
 
 
 ```{r}
-unfilter_df <- read.csv("violence_2021.csv")
+ggplot(data = df, aes(x = dep, y = victim_children)) +
+       stat_boxplot(geom = "errorbar",      # Error bars
+                    width = 0.2) +
+       geom_boxplot(fill = "#4271AE",       # Box color
+                    outlier.colour = "red", # Outliers color
+                    alpha = 0.9) +          # Box color transparency
+       # ggtitle("Boxplot with vector") + # Plot title
+       xlab("") +   # X-axis label
+       ylab("Numero de Hijos") 
 ```
-
-
-
-
 
 
 
