@@ -13,8 +13,9 @@ library(readr) #Leer archivos
 library(lubridate) #Manipular las fechas
 library(aweek) #Manipular las fechas
 library(dplyr)
+install.packages("modeest")
+library(modeest)
 ```
-
 
 ```{r}
 # Read csv file
@@ -29,15 +30,39 @@ dep_highland <-c("Ayacucho", "Junín", "Cusco", "Apurímac", "San Martín", "Caj
 dep_jungle <- c("Amazonas", "Pasco", "Madre de Dios", "Loreto2", "Ucayali")
 
 # Filtered data frames
-db_coastal <- df %>% filter(crime_region %in% dep_coastal)
-db_highland <- df %>% filter(crime_region %in% dep_highland)
-db_jungle <- df %>% filter(crime_region %in% dep_jungle)
+df_coastal <- df %>% filter(crime_region %in% dep_coastal)
+df_highland <- df %>% filter(crime_region %in% dep_highland)
+df_jungle <- df %>% filter(crime_region %in% dep_jungle)
+regions <- c(df_coastal, df_highland, df_jungle)
+```
+
+```{r}
+analyze_single_var <- function(x){
+  print("MEAN: ", mean(x, na.rm = TRUE))
+  print("MEDIAN: ", median(x, na.rm = TRUE))
+  print("MODE: ", mfv(x, na_rm = TRUE))
+}
+
+# Original dfs metrics
+analyze_single_var(df$victim_age)
+analyze_single_var(df$crime_years)
+analyze_single_var(df$victim_children)
+
+# Use different dfs
+analyze_single_var(df_coastal$victim_age)
+analyze_single_var(df_coastal$crime_years)
+analyze_single_var(df_coastal$victim_children)
+analyze_single_var(df_highland$victim_age)
+analyze_single_var(df_highland$crime_years)
+analyze_single_var(df_highland$victim_children)
+analyze_single_var(df_jungle$victim_age)
+analyze_single_var(df_jungle$crime_years)
+analyze_single_var(df_jungle$victim_children)
 ```
 
 ```{r}
 #Dimension del data frame (filas y columnas)
 dim(db) 
-
 
 # Nos muestra las primeras 15 observaciones
 head(db, n = 15) 
