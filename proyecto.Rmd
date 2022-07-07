@@ -20,12 +20,15 @@ library(dplyr)
 # Read csv file
 df <- read.csv("violence_clean.csv")
 
-# Dep distribution used for the research
-dep_coastal <- c("Moquegua", "Ica", "Lima", "Arequipa", "Tacna", "Lambayeque", "Callao", "Ancash", "La Libertad", "Piura", "Tumbes", "Callao")
-dep_highland <-c("Ayachucho", "Junín", "Cusco", "Apurímac", "San Martín", "Cajamarca", "Huancavelica", "Huánuco", "Puno")
-dep_jungle <- c("Amazonas", "Pasco", "Madre de Dios", "Loreto", "Ucayali")
+# Storing only relevant variables
+df <- df %>% dplyr::select(`reporting_center`, `newcase`,`year`, `crime_years`, `crime_region`, `crime_urban`, `crime_femicide_attemp`, `crime_violence_type`, `verbal_assault`, `victim_age`, `victim_children`, `victim_children_groups`, `victim_language`, `victim_civil_status`, `victim_education`, `victim_job_status`, `victim_discapacity`, `victim_filesacomplaint`, `sex_harassment`, `sex_rape`, `verbal_assault`, `thread_children`, `physical_kicks`, `physical_punches`, `physical_hairpull`, `victim_children_groups`, `treatment_psycological`, `treatment_psyquiatric`, `treatment_medic`, `bond_family_d`, `bond_family_d`, `bond_coworkers`, `bond_neighbor`, `bond_friends`, `bond_partner`, `agressor_age`, `agressor_age_group`, `agressor_gender`, `agressor_education`, `agressor_education`, `agressor_job_status`, `agressor_foreign`)
 
-# Filtered dataframes
+# Dep distribution used for the research
+dep_coastal <- c("Moquegua", "Ica", "Lima", "Arequipa", "Tacna", "Lambayeque", "Callao", "Áncash", "La Libertad", "Piura", "Tumbes", "Callao")
+dep_highland <-c("Ayacucho", "Junín", "Cusco", "Apurímac", "San Martín", "Cajamarca", "Huancavelica", "Huánuco", "Puno")
+dep_jungle <- c("Amazonas", "Pasco", "Madre de Dios", "Loreto2", "Ucayali")
+
+# Filtered data frames
 db_coastal <- df %>% filter(crime_region %in% dep_coastal)
 db_highland <- df %>% filter(crime_region %in% dep_highland)
 db_jungle <- df %>% filter(crime_region %in% dep_jungle)
