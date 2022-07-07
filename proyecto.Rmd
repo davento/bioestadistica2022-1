@@ -13,7 +13,6 @@ library(readr) #Leer archivos
 library(lubridate) #Manipular las fechas
 library(aweek) #Manipular las fechas
 library(dplyr)
-install.packages("modeest")
 library(modeest)
 ```
 
@@ -24,11 +23,26 @@ df <- read.csv("violence_clean.csv")
 # Storing only relevant variables
 df <- df %>% dplyr::select(`reporting_center`, `newcase`,`year`, `crime_years`, `crime_region`, `crime_urban`, `crime_femicide_attemp`, `crime_violence_type`, `verbal_assault`, `victim_age`, `victim_children`, `victim_children_groups`, `victim_language`, `victim_civil_status`, `victim_education`, `victim_job_status`, `victim_discapacity`, `victim_filesacomplaint`, `sex_harassment`, `sex_rape`, `verbal_assault`, `thread_children`, `physical_kicks`, `physical_punches`, `physical_hairpull`, `victim_children_groups`, `treatment_psycological`, `treatment_psyquiatric`, `treatment_medic`, `bond_family_d`, `bond_family_d`, `bond_coworkers`, `bond_neighbor`, `bond_friends`, `bond_partner`, `agressor_age`, `agressor_age_group`, `agressor_gender`, `agressor_education`, `agressor_education`, `agressor_job_status`, `agressor_foreign`)
 
+```
+
+```{r}
 # Dep distribution used for the research
 dep_coastal <- c("Moquegua", "Ica", "Lima", "Arequipa", "Tacna", "Lambayeque", "Callao", "Áncash", "La Libertad", "Piura", "Tumbes", "Callao")
 dep_highland <-c("Ayacucho", "Junín", "Cusco", "Apurímac", "San Martín", "Cajamarca", "Huancavelica", "Huánuco", "Puno")
 dep_jungle <- c("Amazonas", "Pasco", "Madre de Dios", "Loreto2", "Ucayali")
+```
 
+
+```{r}
+#add a column for dep
+df['dep'] = NaN
+
+df<- df %>%  
+  mutate(dep = ifelse(crime_region %in% dep_coastal, 'coastal', 
+             ifelse(crime_region %in% dep_highland, 'highland', 'jungle')))
+```
+
+```{r}
 # Filtered data frames
 df_coastal <- df %>% filter(crime_region %in% dep_coastal)
 df_highland <- df %>% filter(crime_region %in% dep_highland)
@@ -36,18 +50,60 @@ df_jungle <- df %>% filter(crime_region %in% dep_jungle)
 regions <- c(df_coastal, df_highland, df_jungle)
 ```
 
+
+
+```{r}
+barplot(table(df$dep))
+```
+
+
+
 ```{r}
 analyze_single_var <- function(x){
-  print("MEAN: ", mean(x, na.rm = TRUE))
-  print("MEDIAN: ", median(x, na.rm = TRUE))
-  print("MODE: ", mfv(x, na_rm = TRUE))
+  # cat("MEAN: ", mean(x, na.rm = TRUE), '\n')
+  # cat("MEDIAN: ", median(x, na.rm = TRUE), '\n')
+  # cat("MODE: ", mfv(x, na_rm = TRUE), '\n')
+  # sub(''substitute(x))
+
+  summary(x)
 }
+```
 
+Analizadno las variables
+```{r}
 # Original dfs metrics
-analyze_single_var(df$victim_age)
-analyze_single_var(df$crime_years)
-analyze_single_var(df$victim_children)
+cat('victim age\n')
+analyze_single_var( df$victim_age)
 
+cat('crime years\n')
+analyze_single_var(df$crime_years)
+
+cat('victim children\n')
+analyze_single_var(df$victim_children)
+```
+
+
+```{r}
+class(df)
+```
+
+
+```{r}
+ggplot(data = df, aes(x = "", y = victim_age)) +
+       stat_boxplot(geom = "errorbar",      # Error bars
+                    width = 0.2) +
+       geom_boxplot(fill = "#4271AE",       # Box color
+                    outlier.colour = "red", # Outliers color
+                    alpha = 0.9) +          # Box color transparency
+       # ggtitle("Boxplot with vector") + # Plot title
+       xlab("") +   # X-axis label
+       ylab("Edad de la victima") +
+       coord_flip() # Horizontal boxplot
+
+```
+
+
+```{r}
 # Use different dfs
 analyze_single_var(df_coastal$victim_age)
 analyze_single_var(df_coastal$crime_years)
