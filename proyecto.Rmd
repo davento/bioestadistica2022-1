@@ -9,11 +9,13 @@ library(haven)
 library(foreign)
 library(nortest)#Kolmogorov
 library(readr) #Leer archivos
-#library(tidyverse) #Manipular la data
+library(tidyverse) #Manipular la data
 library(lubridate) #Manipular las fechas
 library(aweek) #Manipular las fechas
 library(dplyr)
 library(modeest)
+library(hrbrthemes)
+
 ```
 
 # Lecture and Filtering of the data base
@@ -163,11 +165,46 @@ analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5){
   if(cv < threshold_cv){
     is_parametric <- TRUE
   }
+
   return(list("has_normal_dist"=is_normal,"has_parametric_dist"=is_parametric,"p_value"= p_value,"cv"=cv))
 }
 
-victim_age_dist <- analyze_dist(df$victim_age)
-print(victim_age_dist)
+
+
 ```
+
+```{r}
+
+plot_dist <- function(x){
+  a <- ggpubr::ggqqplot(x)
+  return  (a )
+}
+
+plot_dist(df$victim_age)
+hist(df$victim_age)
+```
+
+
+
+```{r}
+
+analyze_dist <- function(title, x_label = "x"){
+  p <- df %>%
+  ggplot( aes(x=victim_age)) +
+    geom_histogram( fill="#69b3a2", color="#e9ecef", alpha=0.9) +
+    ggtitle(title) +
+    xlab(x_label) +   # X-axis label
+    ylab("") +
+    theme_ipsum() +
+    theme(
+      plot.title = element_text(14)
+    )
+  return (p)
+}
+
+print(analyze_dist("hist of age", "Victims's age"))
+
+```
+
 
 
