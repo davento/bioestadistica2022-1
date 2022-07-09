@@ -9,14 +9,16 @@ library(haven)
 library(foreign)
 library(nortest)#Kolmogorov
 library(readr) #Leer archivos
-#library(tidyverse) #Manipular la data
+library(tidyverse) #Manipular la data
 library(lubridate) #Manipular las fechas
 library(aweek) #Manipular las fechas
 library(dplyr)
 library(modeest)
 ```
 
-# Reading and Filtering the data base
+# Lectura de la base de datos
+
+Leyemos la base de datos y nos quedamos con los variables que consideramos importantes.
 
 ```{r}
 # Read csv file
@@ -26,6 +28,8 @@ df <- read.csv("violence_clean.csv")
 df <- df %>% dplyr::select(`reporting_center`, `newcase`,`year`, `crime_years`, `crime_region`, `crime_urban`, `crime_femicide_attemp`, `crime_violence_type`, `verbal_assault`, `victim_age`, `victim_children`, `victim_children_groups`, `victim_language`, `victim_civil_status`, `victim_education`, `victim_job_status`, `victim_discapacity`, `victim_filesacomplaint`, `sex_harassment`, `sex_rape`, `verbal_assault`, `thread_children`, `physical_kicks`, `physical_punches`, `physical_hairpull`, `victim_children_groups`, `treatment_psycological`, `treatment_psyquiatric`, `treatment_medic`, `bond_family`, `bond_coworkers`, `bond_neighbor`, `bond_friends`, `bond_partner`, `agressor_age`, `agressor_age_group`, `agressor_gender`, `agressor_education`, `agressor_education`, `agressor_job_status`, `agressor_foreign`)
 ```
 
+Definimos las regiones a las que pertenecen cada departamento
+
 ```{r}
 # Dep distribution used for the research
 dep_coastal <- c("Moquegua", "Ica", "Lima", "Arequipa", "Tacna", "Lambayeque", "Callao", "Áncash", "La Libertad", "Piura", "Tumbes", "Callao")
@@ -33,6 +37,9 @@ dep_highland <-c("Ayacucho", "Junín", "Cusco", "Apurímac", "San Martín", "Caj
 dep_jungle <- c("Amazonas", "Pasco", "Madre de Dios", "Loreto2", "Ucayali")
 ```
 
+
+
+Creamos una columna para asignar la region del departamento
 
 ```{r}
 #add a column for dep
@@ -43,6 +50,8 @@ df<- df %>%
              ifelse(crime_region %in% dep_highland, 'highland', 'jungle')))
 ```
 
+
+Finalmente separamos el data frame segun region para su uso posterior.
 ```{r}
 # Filtered data frames
 df_coastal <- df %>% filter(crime_region %in% dep_coastal)
@@ -51,6 +60,8 @@ df_jungle <- df %>% filter(crime_region %in% dep_jungle)
 regions <- c(df_coastal, df_highland, df_jungle)
 ```
 
+
+El resultado final
 
 ```{r}
 #Dimension del data frame (filas y columnas)
@@ -416,6 +427,20 @@ chisq_region(df_jungle$crime_femicide_attemp, df_jungle$treatment_medic, "selva"
 
 
 # Análisis Multivariado
+```{r}
+view(df)
+```
+
+
+```{r}
+modelo_inicial <- lm(mpg ~ wt + disp + hp, data = df_coastal )
+
+# Observamos
+summary(modelo_inicial)
+
+```
+
+
 
 
 # Análisis Gráfico
