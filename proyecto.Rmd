@@ -4,6 +4,8 @@ output: html_document
 date: '2022-06-28'
 ---
 
+
+
 ```{r warning=FALSE}
 library(haven)
 library(foreign)
@@ -15,8 +17,10 @@ library(aweek) #Manipular las fechas
 library(dplyr)
 library(modeest)
 ```
+# GENDER BASED VIOLENCE COAST VS. HIGHLANDS VS. JUNGLE
 
-# Lectura de la base de datos
+
+## Lectura de la base de datos
 
 Leyemos la base de datos y nos quedamos con los variables que consideramos importantes.
 
@@ -71,10 +75,7 @@ dim(df)
 head(df, n = 15) 
 ```
 
-# Análisis Descriptivo
-
-
-creamos funciones para poder resumir las variables a tomar en cuenta.
+## Análisis Descriptivo
 
 ```{r}
 analyze_single_var <- function(x){
@@ -87,14 +88,11 @@ analyze_single_var <- function(x){
 }
 ```
 
-## Analizando las variables
+### Analizando las variables
 ```{r}
 # Original dfs metrics
 cat('victim age\n')
 analyze_single_var( df$victim_age)
-
-cat('agressor age\n')
-analyze_single_var( df$agressor_age)
 
 cat('crime years\n')
 analyze_single_var(df$crime_years)
@@ -103,14 +101,11 @@ cat('victim children\n')
 analyze_single_var(df$victim_children)
 ```
 
-Vemos el porcentaje de incidencias por region
 
 ```{r}
 table(df$dep) / nrow(df) * 100
 ```
 
-
-Procedemos a graficar la distribucion para las variables
 
 ```{r}
 ggplot(data = df, aes(x = dep, y = victim_age)) +
@@ -162,15 +157,7 @@ ggplot(data = df, aes(x = dep, y = victim_children)) +
        ylab("Numero de Hijos") 
 ```
 
-## Pruebas de normalidad
-
-A continuacion se haran las pruebas de normalidad con las funciones descritas:
-
-
-
-
-Retorna de acuerdo con la prueba de lillie si es parametrico y/o tiene
-una distribucion normal.
+### Pruebas de normalidad
 
 ```{r, warning=FALSE}
 analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5){
@@ -186,19 +173,19 @@ analyze_dist <- function(x, threshold_p = 0.05, threshold_cv = 0.5){
   }
   return(list("has_normal_dist"=is_normal,"has_parametric_dist"=is_parametric,"p_value"= p_value,"cv"=cv))
 }
+
+victim_age_dist <- analyze_dist(df$victim_age)
+print(victim_age_dist)
 ```
-
-
-Defenimos como vamos a graficar las distribuciones
 
 ```{r}
 plot_dist <- function(x){
   a <- ggpubr::ggqqplot(x)
   return  (a )
 }
+plot_dist(df$victim_age)
+hist(df$victim_age)
 ```
-
-Lo vereficamos con un grafico de barplot
 
 ```{r}
 analyze_dist_graph <- function(title, x_label = "x"){
@@ -214,20 +201,10 @@ analyze_dist_graph <- function(title, x_label = "x"){
     )
   return (p)
 }
-```
-
-graficando las variables:
-
-
-```{r}
-
-analyze_dist(df$victim_age)
-plot_dist(df$victim_age)
 print(analyze_dist_graph("hist of age", "Victims's age"))
 ```
 
-
-# Análisis Bivariado
+## Análisis Bivariado
 
 ```{r}
 chisq_region <- function(x1, x2, dep, threshold_p = 0.05){
@@ -241,68 +218,68 @@ chisq_region <- function(x1, x2, dep, threshold_p = 0.05){
 }
 ```
 
-## Acoso sexual, intento de feminicidio y violación
+### Acoso sexual, intento de feminicidio y violación
 
-### Intento de feminicidio y Acoso sexual
+#### Intento de feminicidio y Acoso sexual
 ```{r}
 chisq_region(df_coastal$crime_femicide_attemp, df_coastal$sex_harassment, "costa")
 chisq_region(df_highland$crime_femicide_attemp, df_highland$sex_harassment, "sierra")
 chisq_region(df_jungle$crime_femicide_attemp, df_jungle$sex_harassment, "selva")
-
 ```
-### Violación y Acoso sexual
+#### Violación y Acoso sexual
 ```{r}
 chisq_region(df_coastal$sex_rape, df_coastal$sex_harassment, "costa")
 chisq_region(df_highland$sex_rape, df_highland$sex_harassment, "sierra")
 chisq_region(df_jungle$sex_rape, df_jungle$sex_harassment, "selva")
 ```
-### Violación y Intento de feminicidio
+#### Violación y Intento de feminicidio
 ```{r}
 chisq_region(df_coastal$sex_rape, df_coastal$crime_femicide_attemp, "costa")
 chisq_region(df_highland$sex_rape, df_highland$crime_femicide_attemp, "sierra")
 chisq_region(df_jungle$sex_rape, df_jungle$crime_femicide_attemp, "selva")
 ```
 
-## Tipo de relación entre víctima y agresor vs. si hubo acoso sexual
+### Tipo de relación entre víctima y agresor vs. si hubo acoso sexual
 
-### Pareja
+#### Pareja
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$bond_partner, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$bond_partner, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$bond_partner, "selva")
 ```
-### Familiar
+#### Familiar
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$bond_family, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$bond_family, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$bond_family, "selva")
 ```
-### Amigo
+#### Amigo
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$bond_friends, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$bond_friends, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$bond_friends, "selva")
 ```
-### Compañero de trabajo
+#### Compañero de trabajo
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$bond_coworkers, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$bond_coworkers, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$bond_coworkers, "selva")
 ```
-### Vecino
+#### Vecino
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$bond_neighbor, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$bond_neighbor, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$bond_neighbor, "selva")
 ```
-## Tipo de relación entre agresor y víctima y si hubo violación
-### Pareja
+
+### Tipo de relación entre agresor y víctima y si hubo violación
+#### Pareja
 ```{r}
 chisq_region(df_coastal$sex_rape, df_coastal$bond_partner, "costa")
 chisq_region(df_highland$sex_rape, df_highland$bond_partner, "sierra")
 chisq_region(df_jungle$sex_rape, df_jungle$bond_partner, "selva")
 ```
-### Familiar
+#### Familiar
 ```{r}
 chisq_region(df_coastal$sex_rape, df_coastal$bond_family, "costa")
 chisq_region(df_highland$sex_rape, df_highland$bond_family, "sierra")
@@ -320,7 +297,8 @@ chisq_region(df_coastal$sex_rape, df_coastal$bond_coworkers, "costa")
 chisq_region(df_highland$sex_rape, df_highland$bond_coworkers, "sierra")
 chisq_region(df_jungle$sex_rape, df_jungle$bond_coworkers, "selva")
 ```
-## Tipo de relación entre agresor y víctima y si hubo intento de feminicidio
+
+### Tipo de relación entre agresor y víctima y si hubo intento de feminicidio
 
 ### Pareja
 ```{r}
@@ -353,76 +331,75 @@ chisq_region(df_highland$crime_femicide_attemp, df_highland$bond_neighbor, "sier
 chisq_region(df_jungle$crime_femicide_attemp, df_jungle$bond_neighbor, "selva")
 ```
 
-## Tipo de agresión y si la víctima denunció al agresor
+### Tipo de agresión y si la víctima denunció al agresor
 
-### Acoso sexual
+#### Acoso sexual
 ```{r}
 chisq_region(df_coastal$sex_harassment, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$sex_harassment, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$sex_harassment, df_jungle$victim_filesacomplaint, "selva")
 ```
 
-### Violación
+#### Violación
 ```{r}
 chisq_region(df_coastal$sex_rape, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$sex_rape, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$sex_rape, df_jungle$victim_filesacomplaint, "selva")
 ```
 
-### Intento de feminicidio
+#### Intento de feminicidio
 ```{r}
 chisq_region(df_coastal$crime_femicide_attemp, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$crime_femicide_attemp, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$crime_femicide_attemp, df_jungle$victim_filesacomplaint, "selva")
 ```
 
-### Jalada de cabello
+#### Jalada de cabello
 ```{r}
 chisq_region(df_coastal$physical_hairpull, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$physical_hairpull, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$physical_hairpull, df_jungle$victim_filesacomplaint, "selva")
 ```
-
-### Puñetes
+#### Puñetes
 ```{r}
 chisq_region(df_coastal$physical_punches, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$physical_punches, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$physical_punches, df_jungle$victim_filesacomplaint, "selva")
 ```
-### Patadas
+#### Patadas
 ```{r}
 chisq_region(df_coastal$physical_kicks, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$physical_hairpull, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$physical_hairpull, df_jungle$victim_filesacomplaint, "sierra")
 ```
 
-## Relación con el agresor y si la víctima denunció al agresor
+### Relación con el agresor y si la víctima denunció al agresor
 
-### Pareja
+#### Pareja
 ```{r}
 chisq_region(df_coastal$bond_partner, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$bond_partner, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$bond_partner, df_jungle$victim_filesacomplaint, "selva")
 ```
-### Familiar
+#### Familiar
 ```{r}
 chisq_region(df_coastal$bond_family, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$bond_family, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$bond_family, df_jungle$victim_filesacomplaint, "selva")
 ```
-### Amigo
+#### Amigo
 ```{r}
 chisq_region(df_coastal$bond_friends, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$bond_friends, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$bond_friends, df_jungle$victim_filesacomplaint, "selva")
 ```
-### Compañero de trabajo
+#### Compañero de trabajo
 ```{r}
 chisq_region(df_coastal$bond_coworkers, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$bond_coworkers, df_highland$victim_filesacomplaint, "sierra")
 chisq_region(df_jungle$bond_coworkers, df_jungle$victim_filesacomplaint, "selva")
 ```
-### Vecino
+#### Vecino
 ```{r}
 chisq_region(df_coastal$bond_neighbor, df_coastal$victim_filesacomplaint, "costa")
 chisq_region(df_highland$bond_neighbor, df_highland$victim_filesacomplaint, "sierra")
@@ -430,20 +407,20 @@ chisq_region(df_jungle$bond_neighbor, df_jungle$victim_filesacomplaint, "selva")
 ```
 
 
-## Intento de feminicidio y si la víctima recibió algún tipo de tratamiento
-### Psiquiátrico
+### Intento de feminicidio y si la víctima recibió algún tipo de tratamiento
+#### Psiquiátrico
 ```{r}
 chisq_region(df_coastal$treatment_psyquiatric, df_coastal$crime_femicide_attemp, "costa")
 chisq_region(df_highland$treatment_psyquiatric, df_highland$crime_femicide_attemp, "sierra")
 chisq_region(df_jungle$treatment_psyquiatric, df_jungle$crime_femicide_attemp, "selva")
 ```
-### Psicológico
+#### Psicológico
 ```{r}
 chisq_region(df_coastal$crime_femicide_attemp, df_coastal$treatment_psycological, "costa")
 chisq_region(df_highland$crime_femicide_attemp, df_highland$treatment_psycological, "sierra")
 chisq_region(df_jungle$crime_femicide_attemp, df_jungle$treatment_psycological, "selva")
 ```
-### Médico
+#### Médico
 ```{r}
 chisq_region(df_coastal$crime_femicide_attemp, df_coastal$treatment_medic, "costa")
 chisq_region(df_highland$crime_femicide_attemp, df_highland$treatment_medic, "sierra")
@@ -451,7 +428,19 @@ chisq_region(df_jungle$crime_femicide_attemp, df_jungle$treatment_medic, "selva"
 ```
 
 
-# Análisis Multivariado
+### Características del crimen por región
 
+#### Costa
+Violación o feminicidio proveniente de compañeros de trabajo y son denunciados
 
-# Análisis Gráfico
+#### Sierra
+- Acoso sexual proveniente de amigos, compañeros de trabajo o vecinos
+- Amigos denunciados por acoso físico
+- La víctima recibe tratamiento psiquiátrico o psicológico si hubo intento de feminicidio
+
+#### Selva
+- Acoso sexual proveniente de familiares, amigos, compañeros de trabajo y vecinos
+- Violación proveniente de familiares y compañeros de trabajo
+- Intento de feminicidio proveniente de vecinos
+- Denuncia por acoso sexual y físico a compañeros de trabajo y vecinos
+- Tratamiento psiquiátrico y psicológico
