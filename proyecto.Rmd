@@ -206,7 +206,7 @@ print(analyze_dist_graph("hist of age", "Victims's age"))
 
 ```{r}
 chisq_region <- function(x1, x2, dep, threshold_p = 0.05){
-  chisq_arr <- chisq_region(x1, x2)
+  chisq_arr <- chisq.test(x1, x2, simulate.p.value = TRUE)
   statistic <- as.numeric(chisq_arr[1])
   p_value <- as.numeric(chisq_arr[3])
   if(p_value > threshold_p) {
